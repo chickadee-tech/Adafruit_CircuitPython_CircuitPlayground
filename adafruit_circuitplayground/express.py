@@ -110,6 +110,7 @@ class Express:
         self._touch_A5 = None
         self._touch_A6 = None
         self._touch_A7 = None
+        self._touch_threshold_adjustment = 0
 
         # Define acceleration:
         self._i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
@@ -188,6 +189,7 @@ class Express:
         """
         if self._touch_A1 is None:
             self._touch_A1 = touchio.TouchIn(board.A1)
+            self._touch_A1 += self._touch_threshold_adjustment
         return self._touch_A1.value
 
     @property
@@ -207,6 +209,7 @@ class Express:
         """
         if self._touch_A2 is None:
             self._touch_A2 = touchio.TouchIn(board.A2)
+            self._touch_A2 += self._touch_threshold_adjustment
         return self._touch_A2.value
 
     @property
@@ -226,6 +229,7 @@ class Express:
         """
         if self._touch_A3 is None:
             self._touch_A3 = touchio.TouchIn(board.A3)
+            self._touch_A3 += self._touch_threshold_adjustment
         return self._touch_A3.value
 
     @property
@@ -245,6 +249,7 @@ class Express:
         """
         if self._touch_A4 is None:
             self._touch_A4 = touchio.TouchIn(board.A4)
+            self._touch_A4 += self._touch_threshold_adjustment
         return self._touch_A4.value
 
     @property
@@ -264,6 +269,7 @@ class Express:
         """
         if self._touch_A5 is None:
             self._touch_A5 = touchio.TouchIn(board.A5)
+            self._touch_A5 += self._touch_threshold_adjustment
         return self._touch_A5.value
 
     @property
@@ -283,6 +289,7 @@ class Express:
         """
         if self._touch_A6 is None:
             self._touch_A6 = touchio.TouchIn(board.A6)
+            self._touch_A6 += self._touch_threshold_adjustment
         return self._touch_A6.value
 
     @property
@@ -302,7 +309,36 @@ class Express:
         """
         if self._touch_A7 is None:
             self._touch_A7 = touchio.TouchIn(board.A7)
+            self._touch_A7 += self._touch_threshold_adjustment
         return self._touch_A7.value
+
+    def adjust_touch_threshold(self, adjustment):
+        """Adjust the threshold needed to activate the capacitive touch pads.
+        Higher numbers make the touch pads less sensitive. Include the names
+        of the touch pads for which you plan to change the threshold. They
+        must be listed as in the example below.
+
+        :param int adjustment: The desired threshold increase
+        :param str pad_names: The names, in a list, of the touch pads you intend to use
+
+        .. image :: /_static/capacitive_touch_pads.jpg
+          :alt: Capacitive touch pads
+
+        .. code-block:: python
+
+          from adafruit_circuitplayground.express import cpx
+
+          cpx.adjust_touch_threshold(200)
+
+          while True:
+              if cpx.touch_A1:
+                  print('Touched pad A1')
+        """
+        for pad_name in ["_touch_A" + x for x in range(1,8)]:
+            touch_in = getattr(self, pad_name)
+            if touch_in:
+                touch_in.threshold += adjustment
+        self._touch_threshold_adjustment += adjustment
 
     @property
     def pixels(self):
