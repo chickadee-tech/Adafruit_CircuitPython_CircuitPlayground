@@ -334,7 +334,7 @@ class Express:
               if cpx.touch_A1:
                   print('Touched pad A1')
         """
-        for pad_name in ["_touch_A" + x for x in range(1,8)]:
+        for pad_name in ["_touch_A" + str(x) for x in range(1,8)]:
             touch_in = getattr(self, pad_name)
             if touch_in:
                 touch_in.threshold += adjustment
